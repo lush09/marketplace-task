@@ -62,15 +62,8 @@ export default function CreateItemPage() {
     let imageUrl = "";
 
     // Validate required fields
-    if (
-      !title ||
-      !category ||
-      !price ||
-      !contactEmail ||
-      !location ||
-      !imageFile
-    ) {
-      setError("Please fill in all required fields and upload a photo.");
+    if (!title || !category || !price || !contactEmail || !location) {
+      setError("Please fill in all required fields.");
       setLoading(false);
       return;
     }
@@ -89,6 +82,8 @@ export default function CreateItemPage() {
           .from("image-uploads")
           .getPublicUrl(fileName);
         imageUrl = publicUrlData.publicUrl;
+      } else {
+        imageUrl = "/placeholder-stock.jpg";
       }
       // Insert into listings table
       const { error: insertError } = await supabase.from("listings").insert([
@@ -122,9 +117,9 @@ export default function CreateItemPage() {
     <div className="w-full">
       <div className="flex flex-col w-full">
         {/* Header is handled by the app layout */}
-        <div className="flex flex-row gap-8 mt-6">
+        <div className="flex flex-col md:flex-row gap-8 mt-6">
           {/* Left: Form */}
-          <div className="flex-1 max-w-md flex flex-col justify-start">
+          <div className="flex-1 max-w-md flex flex-col justify-start w-full md:w-auto order-2 md:order-1 mx-auto">
             <h1 className="text-xl font-bold mb-6 text-gray-800">
               Marketplace
             </h1>
@@ -136,12 +131,24 @@ export default function CreateItemPage() {
                 >
                   Photos
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded p-8 text-center bg-gray-50">
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded p-8 text-center bg-gray-50 cursor-pointer"
+                  onClick={() =>
+                    document.getElementById("image-upload-input")?.click()
+                  }
+                  tabIndex={0}
+                  role="button"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ")
+                      document.getElementById("image-upload-input")?.click();
+                  }}
+                >
                   <input
+                    id="image-upload-input"
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="mb-2"
+                    className="hidden"
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +299,7 @@ export default function CreateItemPage() {
             </form>
           </div>
           {/* Right: Preview */}
-          <div className="flex-1 flex flex-col items-center">
+          <div className="flex-1 flex flex-col items-center w-full md:w-auto order-1 md:order-2">
             <div className="w-full max-w-xl">
               <h2 className="text-xl font-bold text-center mb-4 text-gray-800">
                 Preview
@@ -306,11 +313,17 @@ export default function CreateItemPage() {
                   }}
                 >
                   {/* Image preview placeholder */}
-                  {imageFile && (
+                  {imageFile ? (
                     <img
                       src={URL.createObjectURL(imageFile)}
                       alt="Preview"
                       className="h-full max-h-60 object-contain"
+                    />
+                  ) : (
+                    <img
+                      src="/placeholder-stock.jpg"
+                      alt="Preview"
+                      className="h-full max-h-60 object-contain opacity-60"
                     />
                   )}
                 </div>

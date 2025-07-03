@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { FiSearch } from "react-icons/fi";
 import Header from "../components/Header";
@@ -71,6 +71,8 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Fetch listings from Supabase
   useEffect(() => {
@@ -254,10 +256,45 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onBurgerClick={() => setSidebarOpen(true)} />
       <div className="flex">
+        {/* Offcanvas sidebar for mobile/tablet */}
+        {/* Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black bg-opacity-30 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r min-h-screen flex flex-col p-6">
+        <aside
+          ref={sidebarRef}
+          className={`fixed z-50 top-0 left-0 h-full w-64 bg-white border-r flex flex-col p-6 transform transition-transform duration-300 md:static md:translate-x-0 md:flex md:min-h-screen ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:relative md:z-0`}
+          style={{ minHeight: "100vh" }}
+        >
+          {/* Close button for mobile */}
+          <button
+            className="block md:hidden mb-4 self-end p-2 rounded hover:bg-gray-100"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close sidebar menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="h-6 w-6 text-gray-700"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
           <div className="mb-8">
             <h2 className="font-bold text-lg mb-2 text-gray-800">
               Create new listing
@@ -322,9 +359,10 @@ export default function HomePage() {
             </ul>
           </div>
         </aside>
-
         {/* Main Content */}
-        <main className="flex-1 p-8">{mainContent}</main>
+        <main className="flex-1 p-8 md:ml-0" style={{ marginLeft: 0 }}>
+          {mainContent}
+        </main>
       </div>
     </div>
   );
