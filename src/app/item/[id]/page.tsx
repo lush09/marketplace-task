@@ -4,6 +4,19 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../../../../lib/supabaseClient";
 import Header from "../../../components/Header";
 import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
+
+type Listing = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  email: string;
+  category: string;
+  image_url: string;
+  location: string;
+  created_at: string;
+};
 
 export default function ItemDetailPage({
   params,
@@ -12,7 +25,7 @@ export default function ItemDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const [item, setItem] = useState<any>(null);
+  const [item, setItem] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
@@ -29,7 +42,7 @@ export default function ItemDetailPage({
         .eq("id", id)
         .single();
       if (error) setError("Item not found.");
-      setItem(data);
+      setItem(data as Listing);
       setLoading(false);
     };
     fetchItem();
@@ -90,10 +103,13 @@ export default function ItemDetailPage({
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left: Image */}
             <div className="flex-1 flex items-center justify-center">
-              <img
+              <Image
                 src={item.image_url}
                 alt={item.title}
-                className="rounded-lg max-h-[500px] w-full object-contain bg-white"
+                className="rounded-lg bg-white"
+                width={500}
+                height={500}
+                style={{ objectFit: "contain", maxHeight: 500, width: "100%" }}
               />
             </div>
             {/* Right: Details */}

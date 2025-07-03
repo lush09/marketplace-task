@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import Image from "next/image";
 
 // Use the same categories as in the main page
 const categories = [
@@ -73,10 +74,9 @@ export default function CreateItemPage() {
       if (imageFile) {
         const fileExt = imageFile.name.split(".").pop();
         const fileName = `${Date.now()}.${fileExt}`;
-        const { data: storageData, error: storageError } =
-          await supabase.storage
-            .from("image-uploads")
-            .upload(fileName, imageFile);
+        const { error: storageError } = await supabase.storage
+          .from("image-uploads")
+          .upload(fileName, imageFile);
         if (storageError) throw storageError;
         const { data: publicUrlData } = supabase.storage
           .from("image-uploads")
@@ -314,15 +314,19 @@ export default function CreateItemPage() {
                 >
                   {/* Image preview placeholder */}
                   {imageFile ? (
-                    <img
+                    <Image
                       src={URL.createObjectURL(imageFile)}
                       alt="Preview"
+                      width={400}
+                      height={240}
                       className="h-full max-h-60 object-contain"
                     />
                   ) : (
-                    <img
+                    <Image
                       src="/placeholder-stock.jpg"
                       alt="Preview"
+                      width={400}
+                      height={240}
                       className="h-full max-h-60 object-contain opacity-60"
                     />
                   )}

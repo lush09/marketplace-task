@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import { supabase } from "../../lib/supabaseClient";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
 
 const categories = [
   "Vehicles",
@@ -64,12 +65,24 @@ type MainView =
   | "category"
   | "createListing";
 
+type Listing = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  email: string;
+  category: string;
+  image_url: string;
+  location: string;
+  created_at: string;
+};
+
 export default function HomePage() {
   const [selectedSidebar, setSelectedSidebar] = useState<MainView>("choose");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [search, setSearch] = useState("");
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -112,7 +125,7 @@ export default function HomePage() {
   };
 
   // Filtered listings for category or today's picks
-  let filteredListings: any[] = [];
+  let filteredListings: Listing[] = [];
   if (selectedSidebar === "category" && selectedCategory === "Today's picks") {
     filteredListings = getTodaysPicks(listings);
   } else if (selectedSidebar === "category") {
@@ -218,9 +231,11 @@ export default function HomePage() {
                   prefetch={false}
                 >
                   <div className="h-40 w-full bg-gray-100 rounded mb-4 flex items-center justify-center overflow-hidden">
-                    <img
+                    <Image
                       src={listing.image_url}
                       alt={listing.title}
+                      width={400}
+                      height={160}
                       className="object-cover h-full w-full"
                     />
                   </div>
