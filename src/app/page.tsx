@@ -118,7 +118,7 @@ export default function HomePage() {
   }, [selectedSidebar, selectedCategory, search]);
 
   // For Today's picks: select up to 10 random items
-  const getTodaysPicks = (allListings: any[]) => {
+  const getTodaysPicks = (allListings: Listing[]) => {
     if (!allListings.length) return [];
     const shuffled = [...allListings].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 10);
@@ -356,7 +356,7 @@ export default function HomePage() {
                 }`}
                 onClick={() => handleCategoryClick("Today's picks")}
               >
-                Today's picks
+                Today&apos;s picks
               </li>
               {categories.map((cat) => (
                 <li
